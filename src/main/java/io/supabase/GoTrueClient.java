@@ -141,23 +141,10 @@ public class GoTrueClient {
         checkParam(email, "email");
         checkParam(password, "password");
         currentAuth = api.signInWithEmail(email, password);
+
         return currentAuth;
     }
 
-    /**
-     * Logs in an existing user using their email address.
-     *
-     * @param credentials Object with the email and/or the password or the provider of the user.
-     * @return Details about the authentication.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
-     * @throws IllegalArgumentException if the the credentials are not specified.
-     */
-    public AuthenticationDto signIn(CredentialsDto credentials) throws ApiException {
-        checkParam(credentials, "credentials");
-        checkParam(credentials.getEmail(), "credentials.email");
-        checkParam(credentials.getPassword(), "credentials.password");
-        return signIn(credentials.getEmail(), credentials.getPassword());
-    }
 
     /**
      * Creates a new user using their email address.
@@ -175,21 +162,6 @@ public class GoTrueClient {
         return currentAuth;
     }
 
-    /**
-     * Creates a new user using their email address.
-     *
-     * @param credentials Object with the email and the password of the user.
-     * @return Details about the authentication.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
-     * @throws IllegalArgumentException if the the credentials are not specified.
-     */
-    public AuthenticationDto signUp(CredentialsDto credentials) throws ApiException {
-        checkParam(credentials, "credentials");
-        checkParam(credentials.getEmail(), "credentials.email");
-        checkParam(credentials.getPassword(), "credentials.password");
-        currentAuth = api.signUpWithEmail(credentials);
-        return currentAuth;
-    }
 
     /**
      * Update the currently logged in user

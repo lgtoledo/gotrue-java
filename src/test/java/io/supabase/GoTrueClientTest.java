@@ -174,36 +174,6 @@ class GoTrueClientTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp("example@domain.com", null));
     }
 
-    @Test
-    void signUpWithEmail_credentials() {
-        CredentialsDto credentials = new CredentialsDto();
-        credentials.setEmail("email@example.com");
-        credentials.setPassword("secret");
-
-        AuthenticationDto r = null;
-        try {
-            r = client.signUp(credentials);
-        } catch (ApiException e) {
-            Assertions.fail();
-        }
-        Utils.assertAuthDto(r);
-    }
-
-    @Test
-    void signUpWithEmail_credentials_nulls() {
-        CredentialsDto credentials = new CredentialsDto();
-        credentials.setEmail(null);
-        credentials.setPassword(null);
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(null));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(credentials));
-        credentials.setEmail("example@domain.com");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(credentials));
-        credentials.setEmail(null);
-        credentials.setPassword("secret");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signUp(credentials));
-
-    }
 
     @Test
     void signInWithEmail() {
@@ -228,39 +198,6 @@ class GoTrueClientTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn("", ""));
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn("example@domain.com", ""));
         Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn("", "secret"));
-    }
-
-    @Test
-    void signInWithEmail_credentials() {
-        CredentialsDto credentials = new CredentialsDto();
-        credentials.setEmail("email@example.com");
-        credentials.setPassword("secret");
-
-        AuthenticationDto r = null;
-        try {
-            // create a user
-            client.signUp(credentials);
-            // login with said user
-            r = client.signIn(credentials);
-        } catch (ApiException e) {
-            Assertions.fail();
-        }
-        Utils.assertAuthDto(r);
-    }
-
-    @Test
-    void signInWithEmail_credentials_nulls() {
-        CredentialsDto credentials = new CredentialsDto();
-        credentials.setEmail(null);
-        credentials.setPassword(null);
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(null));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(credentials));
-        credentials.setEmail("example@domain.com");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(credentials));
-        credentials.setEmail(null);
-        credentials.setPassword("secret");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> client.signIn(credentials));
     }
 
     @Test

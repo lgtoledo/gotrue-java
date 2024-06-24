@@ -135,25 +135,15 @@ public class GoTrueApi {
      * @throws ApiException if the underlying http request throws an error of any kind.
      */
     public AuthenticationDto signInWithEmail(String email, String password) throws ApiException {
+        String urlToken = String.format("%s/token?grant_type=password", url);
+
         CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
 
-        return signInWithEmail(credentials);
-    }
-
-    /**
-     * Logs in an existing user using their email address.
-     *
-     * @param credentials Object with the email and the password of the user.
-     * @return Details about the authentication.
-     * @throws ApiException if the underlying http request throws an error of any kind.
-     */
-    public AuthenticationDto signInWithEmail(CredentialsDto credentials) throws ApiException {
-        String urlToken = String.format("%s/token?grant_type=password", url);
-
         return RestUtils.post(credentials, AuthenticationDto.class, headers, urlToken);
     }
+
 
     /**
      * Creates a new user using their email address.
@@ -168,21 +158,11 @@ public class GoTrueApi {
         credentials.setEmail(email);
         credentials.setPassword(password);
 
-        return signUpWithEmail(credentials);
-    }
-
-    /**
-     * Creates a new user using their email address.
-     *
-     * @param credentials Object with the email and the password of the user.
-     * @return Details about the authentication.
-     * @throws ApiException if the underlying http request throws an error of any kind.
-     */
-    public AuthenticationDto signUpWithEmail(CredentialsDto credentials) throws ApiException {
         String urlSignup = String.format("%s/signup", url);
 
         return RestUtils.post(credentials, AuthenticationDto.class, headers, urlSignup);
     }
+
 
     /**
      * Get the default headers plus the Authorization header.

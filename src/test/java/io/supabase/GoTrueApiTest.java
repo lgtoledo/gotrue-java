@@ -60,20 +60,6 @@ class GoTrueApiTest {
         Utils.assertAuthDto(r);
     }
 
-    @Test
-    void signUpWithEmail_credentials() {
-        CredentialsDto credentials = new CredentialsDto();
-        credentials.setEmail("email@example.com");
-        credentials.setPassword("secret");
-
-        AuthenticationDto r = null;
-        try {
-            r = api.signUpWithEmail(credentials);
-        } catch (ApiException e) {
-            Assertions.fail();
-        }
-        Utils.assertAuthDto(r);
-    }
 
     @Test
     void signUpWithEmail_AlreadyExists() {
@@ -100,23 +86,6 @@ class GoTrueApiTest {
         Utils.assertAuthDto(r);
     }
 
-    @Test
-    void signInWithEmail_credentials() {
-        AuthenticationDto r = null;
-        try {
-            // create a user
-            api.signUpWithEmail("email@example.com", "secret");
-
-            // login with said user
-            CredentialsDto credentials = new CredentialsDto();
-            credentials.setEmail("email@example.com");
-            credentials.setPassword("secret");
-            r = api.signInWithEmail(credentials);
-        } catch (ApiException e) {
-            Assertions.fail();
-        }
-        Utils.assertAuthDto(r);
-    }
 
     @Test
     void signInWithEmail_wrongPass() {
