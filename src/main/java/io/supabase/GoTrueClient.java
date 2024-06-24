@@ -135,7 +135,7 @@ public class GoTrueClient {
      * @param password The password of the user.
      * @return Details about the authentication.
      * @throws ApiException             if the underlying http request throws an error of any kind.
-     * @throws IllegalArgumentException if the either or both email and password are not specified.
+     * @throws IllegalArgumentException If either the email, password, or both are not specified.
      */
     public AuthenticationDto signIn(String email, String password) throws ApiException {
         checkParam(email, "email");
