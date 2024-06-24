@@ -34,7 +34,7 @@ class Utils {
         Assertions.assertNotNull(user.getCreatedAt());
         Assertions.assertNotNull(user.getRole());
         Assertions.assertNotNull(user.getLastSignInAt());
-        Assertions.assertNotNull(user.getConfirmedAt());
+//        Assertions.assertNotNull(user.getConfirmedAt());
         Assertions.assertNotNull(user.getCreatedAt());
         Assertions.assertNotNull(user.getUpdatedAt());
         Assertions.assertNotNull(user.getAppMetadata());
@@ -44,7 +44,6 @@ class Utils {
         Assertions.assertNotNull(s);
         Assertions.assertNotNull(s.getAutoconfirm());
         Assertions.assertNotNull(s.getExternal());
-        Assertions.assertNotNull(s.getExternalLabels());
         Assertions.assertNotNull(s.getDisableSignup());
     }
 

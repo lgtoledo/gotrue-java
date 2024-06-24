@@ -9,10 +9,8 @@ import java.util.Map;
 public class SettingsDto {
     @JsonProperty("external")
     Map<String, Boolean> external;
-    @JsonProperty("external_labels")
-    Object externalLabels;
     @JsonProperty("disable_signup")
     Boolean disableSignup;
-    @JsonProperty("autoconfirm")
+    @JsonProperty("mailer_autoconfirm")
     Boolean autoconfirm;
 }
