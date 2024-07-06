@@ -191,7 +191,7 @@ class GoTrueApiTest {
     @Test
     void updateUser_email() {
         UserAttributesDto attr = null;
-        UserUpdatedDto user = null;
+        User user = null;
         try {
             // create a user
             Session r = api.signUpWithEmail("email@example.com", "secret");
@@ -200,31 +200,40 @@ class GoTrueApiTest {
             attr.setEmail("newemail@example.com");
 
             user = api.updateUser(r.getAccessToken(), attr);
-        } catch (GotrueException | ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertUserUpdatedDto(user);
+        Utils.assertUserUpdated(user);
         Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
         Assertions.assertNotNull(user.getUserMetadata());
     }
 
     @Test
     void updateUser_password() {
-        UserUpdatedDto user = null;
+        User user = null;
         try {
             // create a user
             Session r = api.signUpWithEmail("email@example.com", "secret");
 
             UserAttributesDto attr = new UserAttributesDto();
-            attr.setPassword("pass");
+            attr.setPassword("pass12");
 
             user = api.updateUser(r.getAccessToken(), attr);
-        } catch (GotrueException | ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         // normal assert because there is no new email attribute
         Utils.assertUserDto(user);
         Assertions.assertNotNull(user.getUserMetadata());
+
+        // login with the new password
+        Session s = null;
+        try {
+            s = api.signInWithEmail("email@example.com", "pass12");
+        } catch (GotrueException e) {
+            Assertions.fail();
+        }
+        Utils.assertSession(s);
     }
 
     @Test
@@ -236,13 +245,13 @@ class GoTrueApiTest {
 
     @Test
     void getSettings() {
-        SettingsDto s = null;
+        Settings s = null;
         try {
             s = api.getSettings();
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertSettingsDto(s);
+        Utils.assertSettings(s);
     }
 
     @Test

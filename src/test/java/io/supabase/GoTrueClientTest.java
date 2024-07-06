@@ -210,23 +210,23 @@ class GoTrueClientTest {
         UserAttributesDto attr = new UserAttributesDto();
         attr.setEmail("newemail@example.com");
 
-        UserUpdatedDto user = null;
+        User user = null;
         try {
             user = client.update(attr);
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
 
-        Utils.assertUserUpdatedDto(user);
+        Utils.assertUserUpdated(user);
         Assertions.assertNotNull(user.getUserMetadata());
         Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
 
         try {
             user = client.update(client.getCurrentAuth().getAccessToken(), attr);
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertUserUpdatedDto(user);
+        Utils.assertUserUpdated(user);
         Assertions.assertNotNull(user.getUserMetadata());
         Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
     }
@@ -265,13 +265,13 @@ class GoTrueClientTest {
         UserAttributesDto attr = new UserAttributesDto();
         attr.setEmail("newemail@example.com");
 
-        UserUpdatedDto user = null;
+        User user = null;
         try {
             user = client.update(r.getAccessToken(), attr);
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertUserUpdatedDto(user);
+        Utils.assertUserUpdated(user);
         Assertions.assertNotNull(user.getUserMetadata());
         Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
     }
@@ -313,13 +313,13 @@ class GoTrueClientTest {
 
     @Test
     void getSettings() {
-        SettingsDto s = null;
+        Settings s = null;
         try {
             s = client.settings();
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertSettingsDto(s);
+        Utils.assertSettings(s);
     }
 
     @Test

@@ -1,8 +1,7 @@
 package io.supabase;
 
-import io.supabase.data.dto.SettingsDto;
+import io.supabase.data.dto.Settings;
 import io.supabase.data.dto.UserDto;
-import io.supabase.data.dto.UserUpdatedDto;
 import io.supabase.data.jwt.ParsedToken;
 import io.supabase.data.dto.Session;
 import io.supabase.schemas.User;
@@ -21,7 +20,7 @@ class Utils {
         // no check for userMetadata as it tends to be null here
     }
 
-    protected static void assertUserUpdatedDto(UserUpdatedDto user) {
+    protected static void assertUserUpdated(User user) {
         Assertions.assertNotNull(user.getNewEmail());
         Assertions.assertNotNull(user.getEmailChangeSentAt());
         assertUserDto(user);
@@ -55,9 +54,9 @@ class Utils {
         Assertions.assertNotNull(user.getAppMetadata());
     }
 
-    protected static void assertSettingsDto(SettingsDto s) {
+    protected static void assertSettings(Settings s) {
         Assertions.assertNotNull(s);
-        Assertions.assertNotNull(s.getAutoconfirm());
+        Assertions.assertNotNull(s.getMailerAutoconfirm());
         Assertions.assertNotNull(s.getExternal());
         Assertions.assertNotNull(s.getDisableSignup());
     }

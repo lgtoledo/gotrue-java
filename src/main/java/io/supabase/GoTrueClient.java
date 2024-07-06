@@ -170,15 +170,15 @@ public class GoTrueClient {
 
 
     /**
-     * Update the currently logged in user
+     * Update the currently logged-in user
      *
      * @param attributes The data you want to update
      * @return details of the updated user.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if you are currently not logged in.
      * @throws IllegalArgumentException if the attributes are not specified.
      */
-    public UserUpdatedDto update(UserAttributesDto attributes) throws ApiException {
+    public User update(UserAttributesDto attributes) throws GotrueException {
         checkAuthState();
         checkParam(attributes, "attributes");
 
@@ -191,11 +191,11 @@ public class GoTrueClient {
      * @param jwt        of the user you want to update.
      * @param attributes The data you want to update
      * @return details of the updated user.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the jwt token is not specified.
      * @throws IllegalArgumentException if the attributes are not specified.
      */
-    public UserUpdatedDto update(String jwt, UserAttributesDto attributes) throws ApiException {
+    public User update(String jwt, UserAttributesDto attributes) throws GotrueException {
         checkParam(jwt, "jwt");
         checkParam(attributes, "attributes");
 
@@ -229,9 +229,9 @@ public class GoTrueClient {
      * Get the settings from the gotrue server.
      *
      * @return settings from the gotrue server.
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public SettingsDto settings() throws ApiException {
+    public Settings settings() throws GotrueException {
 
         return api.getSettings();
     }

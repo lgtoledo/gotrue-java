@@ -59,12 +59,12 @@ public class GoTrueApi {
      * Get the settings from the gotrue server.
      *
      * @return settings from the gotrue server.
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public SettingsDto getSettings() throws ApiException {
+    public Settings getSettings() throws GotrueException {
         String urlSettings = String.format("%s/settings", url);
 
-        return Helpers.get(SettingsDto.class, headers, urlSettings);
+        return Helpers.makeRequest(HttpMethod.GET, urlSettings, null, headers, Settings.class);
     }
 
     /**
@@ -80,15 +80,15 @@ public class GoTrueApi {
     /**
      * Update a user.
      *
-     * @param jwt        A valid JWT.
+     * @param jwt   A valid JWT.
      * @param attributes The data you want to update
      * @return details of the updated user.
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributes) throws ApiException {
+    public User updateUser(String jwt, UserAttributesDto attributes) throws GotrueException {
         String urlUser = String.format("%s/user", url);
 
-        return Helpers.put(attributes, UserUpdatedDto.class, headersWithJWT(jwt), urlUser);
+        return Helpers.makeRequest(HttpMethod.PUT, urlUser, attributes, headersWithJWT(jwt), User.class);
     }
 
     // TODO: Ver porqué en C# también se pasa como parámetro el AccessToken
