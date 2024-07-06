@@ -170,9 +170,14 @@ class GoTrueApiTest {
 
             String token = r.getRefreshToken();
 
+            // wait for some milliseconds to ensure that the tokens are different
+            Thread.sleep(1000);
+
             a = api.refreshAccessToken(token);
         } catch (GotrueException e) {
             Assertions.fail();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
         Utils.assertSession(a);
         Assertions.assertNotEquals(r.getAccessToken(), a.getAccessToken());
