@@ -5,7 +5,7 @@ import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.GotrueException;
 import io.supabase.exceptions.UrlNotFoundException;
 import io.supabase.data.dto.Session;
-import io.supabase.utils.RestUtils;
+import io.supabase.utils.Helpers;
 import org.springframework.http.HttpMethod;
 
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public class GoTrueApi {
         EmailDto emailDto = new EmailDto();
         emailDto.setEmail(email);
 
-        RestUtils.post(emailDto, headers, urlMagicLink);
+        Helpers.post(emailDto, headers, urlMagicLink);
     }
 
     /**
@@ -50,7 +50,7 @@ public class GoTrueApi {
         EmailDto emailDto = new EmailDto();
         emailDto.setEmail(email);
 
-        RestUtils.post(emailDto, headers, urlRecover);
+        Helpers.post(emailDto, headers, urlRecover);
     }
 
     /**
@@ -62,7 +62,7 @@ public class GoTrueApi {
     public SettingsDto getSettings() throws ApiException {
         String urlSettings = String.format("%s/settings", url);
 
-        return RestUtils.get(SettingsDto.class, headers, urlSettings);
+        return Helpers.get(SettingsDto.class, headers, urlSettings);
     }
 
     /**
@@ -86,7 +86,7 @@ public class GoTrueApi {
     public UserUpdatedDto updateUser(String jwt, UserAttributesDto attributes) throws ApiException {
         String urlUser = String.format("%s/user", url);
 
-        return RestUtils.put(attributes, UserUpdatedDto.class, headersWithJWT(jwt), urlUser);
+        return Helpers.put(attributes, UserUpdatedDto.class, headersWithJWT(jwt), urlUser);
     }
 
     /**
@@ -101,7 +101,7 @@ public class GoTrueApi {
         RefreshTokenDto refreshTokenDto = new RefreshTokenDto();
         refreshTokenDto.setRefreshToken(refreshToken);
 
-        return RestUtils.post(refreshTokenDto, Session.class, headers, urlToken);
+        return Helpers.post(refreshTokenDto, Session.class, headers, urlToken);
     }
 
     /**
@@ -114,7 +114,7 @@ public class GoTrueApi {
     public UserDto getUser(String jwt) throws ApiException {
         String urlUser = String.format("%s/user", url);
 
-        return RestUtils.get(UserDto.class, headersWithJWT(jwt), urlUser);
+        return Helpers.get(UserDto.class, headersWithJWT(jwt), urlUser);
     }
 
     /**
@@ -126,7 +126,7 @@ public class GoTrueApi {
     public void signOut(String jwt) throws ApiException {
         String urlLogout = String.format("%s/logout", url);
 
-        RestUtils.post(headersWithJWT(jwt), urlLogout);
+        Helpers.post(headersWithJWT(jwt), urlLogout);
     }
 
     /**
@@ -144,7 +144,7 @@ public class GoTrueApi {
         credentials.setEmail(email);
         credentials.setPassword(password);
 
-        return RestUtils.makeRequest(HttpMethod.POST, urlToken, credentials, headers, Session.class);
+        return Helpers.makeRequest(HttpMethod.POST, urlToken, credentials, headers, Session.class);
     }
 
 
@@ -163,7 +163,7 @@ public class GoTrueApi {
 
         String urlSignup = String.format("%s/signup", url);
 
-        return RestUtils.makeRequest(HttpMethod.POST, urlSignup, credentials, headers, Session.class);
+        return Helpers.makeRequest(HttpMethod.POST, urlSignup, credentials, headers, Session.class);
     }
 
 
