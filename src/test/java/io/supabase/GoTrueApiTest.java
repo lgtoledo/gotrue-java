@@ -295,7 +295,14 @@ class GoTrueApiTest {
         }
         final Session finalR = r;
         // send recovery link to user
-        Assertions.assertDoesNotThrow(() -> api.magicLink(finalR.getUser().getEmail()));
+        BaseResponse response = Assertions.assertDoesNotThrow(() -> api.magicLink(finalR.getUser().getEmail()));
+
+        // An empty JSON object is returned. To obfuscate whether such an email address already
+        // exists in the system this response is sent regardless whether the address exists or not
+        // Verify that the response is not null and that the status code is OK (200)
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals("{}", response.getContent());
+        Assertions.assertEquals(HttpStatus.OK, response.getResponseMessage().getStatusCode());
     }
 
     @Test

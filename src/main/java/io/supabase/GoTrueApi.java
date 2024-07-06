@@ -29,15 +29,15 @@ public class GoTrueApi {
      * Send a magic-link to a given email.
      *
      * @param email the email the link should be sent to.
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public void magicLink(String email) throws ApiException {
+    public BaseResponse magicLink(String email) throws GotrueException {
         String urlMagicLink = String.format("%s/magiclink", url);
 
         EmailDto emailDto = new EmailDto();
         emailDto.setEmail(email);
 
-        Helpers.post(emailDto, headers, urlMagicLink);
+        return Helpers.makeRequest(HttpMethod.POST, urlMagicLink, emailDto, headers);
     }
 
     /**
