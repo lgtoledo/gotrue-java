@@ -4,82 +4,84 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
-public class UserSchema {
-    private String id;
+public class User {
+    String id;
 
     @JsonProperty("aud")
-    private String aud;
+    String aud;
 
     @JsonProperty("role")
-    private String role;
+    String role;
 
     @JsonProperty("email")
-    private String email;
+    String email;
 
     @JsonProperty("email_confirmed_at")
-    private String emailConfirmedAt;
+    String emailConfirmedAt;
 
     @JsonProperty("phone")
-    private String phone;
+    String phone;
 
     @JsonProperty("phone_confirmed_at")
-    private String phoneConfirmedAt;
+    String phoneConfirmedAt;
 
     @JsonProperty("confirmation_sent_at")
-    private String confirmationSentAt;
+    String confirmationSentAt;
 
     @JsonProperty("confirmed_at")
-    private String confirmedAt;
+    String confirmedAt;
 
     @JsonProperty("recovery_sent_at")
-    private String recoverySentAt;
+    String recoverySentAt;
 
     @JsonProperty("new_email")
-    private String newEmail;
+    String newEmail;
 
     @JsonProperty("email_change_sent_at")
-    private String emailChangeSentAt;
+    String emailChangeSentAt;
 
     @JsonProperty("new_phone")
-    private String newPhone;
+    String newPhone;
 
     @JsonProperty("phone_change_sent_at")
-    private String phoneChangeSentAt;
+    String phoneChangeSentAt;
 
     @JsonProperty("reauthentication_sent_at")
-    private String reauthenticationSentAt;
+    String reauthenticationSentAt;
 
     @JsonProperty("last_sign_in_at")
-    private String lastSignInAt;
+    String lastSignInAt;
 
     @JsonProperty("app_metadata")
-    private Object appMetadata;
+    Map<String, Object> appMetadata = new HashMap<>();
 
     @JsonProperty("user_metadata")
-    private Object userMetadata;
+    Map<String, Object> userMetadata = new HashMap<>();
 
     @JsonProperty("factors")
-    private List<MFAFactorSchema> factors;
+    List<MFAFactorSchema> factors;
 
     @JsonProperty("identities")
-    private List<IdentitySchema> identities;
+    List<UserIdentity> identities;
 
     @JsonProperty("banned_until")
-    private String bannedUntil;
+    String bannedUntil;
 
     @JsonProperty("created_at")
-    private String createdAt;
+    String createdAt;
 
     @JsonProperty("updated_at")
-    private String updatedAt;
+    String updatedAt;
 
     @JsonProperty("deleted_at")
-    private String deletedAt;
+    String deletedAt;
 
     @JsonProperty("is_anonymous")
-    private boolean isAnonymous;
+    boolean isAnonymous;
 }

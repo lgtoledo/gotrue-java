@@ -5,7 +5,7 @@ import io.supabase.data.dto.UserDto;
 import io.supabase.data.dto.UserUpdatedDto;
 import io.supabase.data.jwt.ParsedToken;
 import io.supabase.data.dto.Session;
-import io.supabase.schemas.UserSchema;
+import io.supabase.schemas.User;
 import org.junit.jupiter.api.Assertions;
 
 class Utils {
@@ -41,7 +41,7 @@ class Utils {
         Assertions.assertNotNull(user.getAppMetadata());
     }
 
-    protected static void assertUserDto(UserSchema user) {
+    protected static void assertUserDto(User user) {
         Assertions.assertNotNull(user);
         Assertions.assertNotNull(user.getId());
         Assertions.assertNotNull(user.getAud());

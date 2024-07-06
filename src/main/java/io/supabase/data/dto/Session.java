@@ -1,7 +1,7 @@
 package io.supabase.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.supabase.schemas.UserSchema;
+import io.supabase.schemas.User;
 import io.supabase.schemas.WeakPassword;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +30,6 @@ public class Session {
     private WeakPassword weakPassword;
 
     @JsonProperty("user")
-    private UserSchema user;
+    private User user;
 
 }
