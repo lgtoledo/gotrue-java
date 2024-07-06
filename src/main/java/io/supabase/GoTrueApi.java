@@ -96,12 +96,12 @@ public class GoTrueApi {
      * @return The updated information with the refreshed token
      * @throws ApiException if the underlying http request throws an error of any kind.
      */
-    public AuthenticationDto refreshAccessToken(String refreshToken) throws ApiException {
+    public Session refreshAccessToken(String refreshToken) throws ApiException {
         String urlToken = String.format("%s/token?grant_type=refresh_token", url);
         RefreshTokenDto refreshTokenDto = new RefreshTokenDto();
         refreshTokenDto.setRefreshToken(refreshToken);
 
-        return RestUtils.post(refreshTokenDto, AuthenticationDto.class, headers, urlToken);
+        return RestUtils.post(refreshTokenDto, Session.class, headers, urlToken);
     }
 
     /**
@@ -154,16 +154,16 @@ public class GoTrueApi {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public AuthenticationDto signUpWithEmail(String email, String password) throws ApiException {
+    public Session signUpWithEmail(String email, String password) throws GotrueException {
         CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
 
         String urlSignup = String.format("%s/signup", url);
 
-        return RestUtils.post(credentials, AuthenticationDto.class, headers, urlSignup);
+        return RestUtils.makeRequest(HttpMethod.POST, urlSignup, credentials, headers, Session.class);
     }
 
 

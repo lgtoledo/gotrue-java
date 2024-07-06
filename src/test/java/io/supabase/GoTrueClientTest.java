@@ -3,10 +3,8 @@ package io.supabase;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
-import io.supabase.exceptions.ApiException;
-import io.supabase.exceptions.JwtSecretNotFoundException;
-import io.supabase.exceptions.MalformedHeadersException;
-import io.supabase.exceptions.UrlNotFoundException;
+import io.supabase.exceptions.*;
+import io.supabase.schemas.UserSchema;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +38,7 @@ class GoTrueClientTest {
 
     @AfterEach
     void tearDown() {
-        // to ensure that the tests dont affect each other
+        // to ensure that the tests don't affect each other
         RestTemplate rest = new RestTemplate();
         rest.delete("http://localhost:3000/users");
     }
@@ -136,7 +134,7 @@ class GoTrueClientTest {
     @SuppressWarnings("unchecked")
     void constructorWithEnv_headers() {
         try {
-            // set url so it doesnt throw
+            // set url so it doesn't throw
             System.setProperty("gotrue.url", url);
             Assertions.assertDoesNotThrow((ThrowingSupplier<GoTrueClient>) GoTrueClient::new);
 
@@ -158,13 +156,13 @@ class GoTrueClientTest {
 
     @Test
     void signUpWithEmail() {
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertAuthDto(r);
+        Utils.assertSession(r);
     }
 
     @Test
@@ -177,16 +175,16 @@ class GoTrueClientTest {
 
     @Test
     void signInWithEmail() {
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             // create a user
             client.signUp("email@example.com", "secret");
             // login with said user
             r = client.signIn("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (ApiException | GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertAuthDto(r);
+        Utils.assertSession(r);
     }
 
     @Test
@@ -205,7 +203,7 @@ class GoTrueClientTest {
         // create a user
         try {
             client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
 
@@ -243,7 +241,7 @@ class GoTrueClientTest {
         // create a user
         try {
             client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
 
@@ -257,10 +255,10 @@ class GoTrueClientTest {
     @Test
     void updateUser_email_jwt_given() {
         // create a user
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
 
@@ -283,7 +281,7 @@ class GoTrueClientTest {
         // create a user to get a valid JWT, that is saved
         try {
             client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
 
@@ -302,10 +300,10 @@ class GoTrueClientTest {
     @Test
     void signOut_jwt() {
         // create a user to get a valid JWT
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         String jwt = r.getAccessToken();
@@ -327,22 +325,22 @@ class GoTrueClientTest {
     @Test
     void refresh() {
         // create a user to get a valid refreshToken
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         String token = r.getRefreshToken();
 
-        AuthenticationDto a = null;
+        Session a = null;
         try {
             a = client.refresh(token);
         } catch (ApiException e) {
             Assertions.fail();
         }
 
-        Utils.assertAuthDto(a);
+        Utils.assertSession(a);
         Assertions.assertNotEquals(r.getAccessToken(), a.getAccessToken());
         Assertions.assertNotEquals(r.getRefreshToken(), a.getRefreshToken());
     }
@@ -350,20 +348,20 @@ class GoTrueClientTest {
     @Test
     void refresh_current() {
         // create a user to get a valid refreshToken
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
 
-        AuthenticationDto a = null;
+        Session a = null;
         try {
             a = client.refresh();
         } catch (ApiException e) {
             Assertions.fail();
         }
-        Utils.assertAuthDto(a);
+        Utils.assertSession(a);
         Assertions.assertNotEquals(r.getAccessToken(), a.getAccessToken());
         Assertions.assertNotEquals(r.getRefreshToken(), a.getRefreshToken());
     }
@@ -382,10 +380,10 @@ class GoTrueClientTest {
     @Test
     void getUser() {
         // create a user to get a valid JWT
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         String jwt = r.getAccessToken();
@@ -416,13 +414,13 @@ class GoTrueClientTest {
     @Test
     void getCurrentUser() {
         // create a user
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        UserDto user = client.getCurrentUser();
+        UserSchema user = client.getCurrentUser();
         Assertions.assertEquals(r.getUser(), user);
     }
 
@@ -435,10 +433,10 @@ class GoTrueClientTest {
     @Test
     void getCurrentAuth() {
         // create a user
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
 
@@ -479,10 +477,10 @@ class GoTrueClientTest {
         // provide secret
         System.setProperty("gotrue.jwt.secret", "superSecretJwtToken");
         // create a user
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         ParsedToken parsedToken = null;
@@ -499,7 +497,7 @@ class GoTrueClientTest {
     void parseJwt_metadata_provided() {
         // provide secret
         System.setProperty("gotrue.jwt.secret", "superSecretJwtToken");
-        AuthenticationDto r = null;
+        Session r = null;
         UserAttributesDto attr = new UserAttributesDto();
         attr.setData(new HashMap<String, Object>() {{
             put("name", "UserName");
@@ -509,7 +507,7 @@ class GoTrueClientTest {
             client.signUp("email@example.com", "secret");
             client.update(attr);
             r = client.signIn("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (ApiException | GotrueException e) {
             Assertions.fail();
         }
 
@@ -526,9 +524,9 @@ class GoTrueClientTest {
     void parseJwt_no_secret() {
         try {
             // create a user
-            AuthenticationDto r = client.signUp("email@example.com", "secret");
+            Session r = client.signUp("email@example.com", "secret");
             Assertions.assertThrows(JwtSecretNotFoundException.class, () -> client.parseJwt(r.getAccessToken()));
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
     }
@@ -553,10 +551,10 @@ class GoTrueClientTest {
         // provide secret
         System.setProperty("gotrue.jwt.secret", "superSecretJwtToken");
         // create a user
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
 
@@ -590,14 +588,14 @@ class GoTrueClientTest {
 
     @Test
     void recoverPassword() {
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             // create a user
             r = client.signUp("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        final AuthenticationDto finalR = r;
+        final Session finalR = r;
         // send recovery link to user
         Assertions.assertDoesNotThrow(() -> client.recover(finalR.getUser().getEmail()));
     }
