@@ -171,7 +171,7 @@ class GoTrueApiTest {
             String token = r.getRefreshToken();
 
             a = api.refreshAccessToken(token);
-        } catch (GotrueException | ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         Utils.assertSession(a);
@@ -182,7 +182,10 @@ class GoTrueApiTest {
     @Test
     void refreshAccessToken_invalidToken() {
         String token = "noValidToken";
-        Assertions.assertThrows(ApiException.class, () -> api.refreshAccessToken(token));
+        GotrueException exception = Assertions.assertThrows(GotrueException.class, () -> api.refreshAccessToken(token));
+
+        // Verify that the reason is InvalidRefreshToken
+        Assertions.assertEquals(FailureHint.Reason.InvalidRefreshToken, exception.getReason());
     }
 
     @Test

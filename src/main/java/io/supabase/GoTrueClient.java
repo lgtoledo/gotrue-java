@@ -240,10 +240,10 @@ public class GoTrueClient {
      * Generates a new JWT, for current user.
      *
      * @return The updated information with the refreshed token
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if you are currently not logged in.
      */
-    public Session refresh() throws ApiException {
+    public Session refresh() throws GotrueException {
         checkAuthState();
 
         return api.refreshAccessToken(currentAuth.getRefreshToken());
@@ -269,10 +269,10 @@ public class GoTrueClient {
      *
      * @param refreshToken A valid refresh token that was returned on login.
      * @return The updated information with the refreshed token
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the refresh token is not specified.
      */
-    public Session refresh(String refreshToken) throws ApiException {
+    public Session refresh(String refreshToken) throws GotrueException {
         checkParam(refreshToken, "refreshToken");
 
         return api.refreshAccessToken(refreshToken);

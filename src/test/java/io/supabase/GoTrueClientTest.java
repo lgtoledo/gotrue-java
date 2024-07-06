@@ -336,7 +336,7 @@ class GoTrueClientTest {
         Session a = null;
         try {
             a = client.refresh(token);
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
 
@@ -358,7 +358,7 @@ class GoTrueClientTest {
         Session a = null;
         try {
             a = client.refresh();
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         Utils.assertSession(a);

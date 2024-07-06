@@ -91,19 +91,21 @@ public class GoTrueApi {
         return Helpers.put(attributes, UserUpdatedDto.class, headersWithJWT(jwt), urlUser);
     }
 
+    // TODO: Ver porqué en C# también se pasa como parámetro el AccessToken
     /**
      * Generates a new JWT
      *
      * @param refreshToken A valid refresh token that was returned on login.
      * @return The updated information with the refreshed token
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public Session refreshAccessToken(String refreshToken) throws ApiException {
+    public Session refreshAccessToken(String refreshToken) throws GotrueException {
         String urlToken = String.format("%s/token?grant_type=refresh_token", url);
+
         RefreshTokenDto refreshTokenDto = new RefreshTokenDto();
         refreshTokenDto.setRefreshToken(refreshToken);
 
-        return Helpers.post(refreshTokenDto, Session.class, headers, urlToken);
+        return Helpers.makeRequest(HttpMethod.POST, urlToken, refreshTokenDto, headers, Session.class);
     }
 
     /**
@@ -115,6 +117,19 @@ public class GoTrueApi {
      */
     public User getUser(String jwt) throws GotrueException {
         String urlUser = String.format("%s/user", url);
+
+        return Helpers.makeRequest(HttpMethod.GET, urlUser, null, headersWithJWT(jwt), User.class);
+    }
+
+    // TODO: Test this method
+    /**
+     * Get user details by Id
+     * @param jwt A valid JWT. Must be a full-access API Key (e.g. service_role key)
+     * @param userId The user ID to get details for
+     * @return User
+     */
+    public User getUserById(String jwt, String userId) throws GotrueException {
+        String urlUser = String.format("%s/admin/users/%s", url, userId);
 
         return Helpers.makeRequest(HttpMethod.GET, urlUser, null, headersWithJWT(jwt), User.class);
     }
