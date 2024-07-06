@@ -5,11 +5,24 @@ import io.supabase.data.dto.SettingsDto;
 import io.supabase.data.dto.UserDto;
 import io.supabase.data.dto.UserUpdatedDto;
 import io.supabase.data.jwt.ParsedToken;
+import io.supabase.data.dto.Session;
+import io.supabase.schemas.UserSchema;
 import org.junit.jupiter.api.Assertions;
 
 class Utils {
 
     protected static void assertAuthDto(AuthenticationDto dto) {
+        Assertions.assertNotNull(dto);
+        Assertions.assertNotNull(dto.getAccessToken());
+        Assertions.assertTrue(dto.getExpiresIn() > 0);
+        Assertions.assertNotNull(dto.getRefreshToken());
+        Assertions.assertNotNull(dto.getTokenType());
+        Assertions.assertNotNull(dto.getUser());
+        assertUserDto(dto.getUser());
+        // no check for userMetadata as it tends to be null here
+    }
+
+    protected static void assertSession(Session dto) {
         Assertions.assertNotNull(dto);
         Assertions.assertNotNull(dto.getAccessToken());
         Assertions.assertTrue(dto.getExpiresIn() > 0);
@@ -27,6 +40,20 @@ class Utils {
     }
 
     protected static void assertUserDto(UserDto user) {
+        Assertions.assertNotNull(user);
+        Assertions.assertNotNull(user.getId());
+        Assertions.assertNotNull(user.getAud());
+        Assertions.assertNotNull(user.getEmail());
+        Assertions.assertNotNull(user.getCreatedAt());
+        Assertions.assertNotNull(user.getRole());
+        Assertions.assertNotNull(user.getLastSignInAt());
+//        Assertions.assertNotNull(user.getConfirmedAt());
+        Assertions.assertNotNull(user.getCreatedAt());
+        Assertions.assertNotNull(user.getUpdatedAt());
+        Assertions.assertNotNull(user.getAppMetadata());
+    }
+
+    protected static void assertUserDto(UserSchema user) {
         Assertions.assertNotNull(user);
         Assertions.assertNotNull(user.getId());
         Assertions.assertNotNull(user.getAud());

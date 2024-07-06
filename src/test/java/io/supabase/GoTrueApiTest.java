@@ -1,8 +1,8 @@
 package io.supabase;
 
 import io.supabase.data.dto.*;
-import io.supabase.exceptions.ApiException;
-import io.supabase.exceptions.UrlNotFoundException;
+import io.supabase.exceptions.*;
+import io.supabase.data.dto.Session;
 import org.junit.jupiter.api.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -71,19 +71,20 @@ class GoTrueApiTest {
         Assertions.assertThrows(ApiException.class, () -> api.signUpWithEmail("email@example.com", "secret"));
     }
 
+
     @Test
     void signInWithEmail() {
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             // create a user
             api.signUpWithEmail("email@example.com", "secret");
 
             // login with said user
             r = api.signInWithEmail("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (ApiException | GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertAuthDto(r);
+        Utils.assertSession(r);
     }
 
 
@@ -95,9 +96,16 @@ class GoTrueApiTest {
         } catch (ApiException e) {
             Assertions.fail();
         }
-        // login with said user
-        Assertions.assertThrows(ApiException.class, () -> api.signInWithEmail("email@example.com", "notSecret"));
+
+        // login with said user and check the exception
+        GotrueException exception = Assertions.assertThrows(GotrueException.class, () -> {
+            api.signInWithEmail("email@example.com", "notSecret");
+        });
+
+        // Verify that the reason is UserBadLogin
+        Assertions.assertEquals(FailureHint.Reason.UserBadLogin, exception.getReason());
     }
+
 
     @Test
     void signOut() {

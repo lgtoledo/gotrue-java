@@ -2,8 +2,11 @@ package io.supabase;
 
 import io.supabase.data.dto.*;
 import io.supabase.exceptions.ApiException;
+import io.supabase.exceptions.GotrueException;
 import io.supabase.exceptions.UrlNotFoundException;
+import io.supabase.data.dto.Session;
 import io.supabase.utils.RestUtils;
+import org.springframework.http.HttpMethod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +24,7 @@ public class GoTrueApi {
     }
 
     /**
-     * Send an magic-link to a given email.
+     * Send a magic-link to a given email.
      *
      * @param email the email the link should be sent to.
      * @throws ApiException if the underlying http request throws an error of any kind.
@@ -132,16 +135,16 @@ public class GoTrueApi {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public AuthenticationDto signInWithEmail(String email, String password) throws ApiException {
+    public Session signInWithEmail(String email, String password) throws GotrueException {
         String urlToken = String.format("%s/token?grant_type=password", url);
 
         CredentialsDto credentials = new CredentialsDto();
         credentials.setEmail(email);
         credentials.setPassword(password);
 
-        return RestUtils.post(credentials, AuthenticationDto.class, headers, urlToken);
+        return RestUtils.makeRequest(HttpMethod.POST, urlToken, credentials, headers, Session.class);
     }
 
 
