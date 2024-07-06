@@ -282,10 +282,10 @@ public class GoTrueClient {
      * Send a password-recovery link to a given email.
      *
      * @param email the email a recovery link should be sent to.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException             if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the email is not specified.
      */
-    public void recover(String email) throws ApiException {
+    public void recover(String email) throws GotrueException {
         checkParam(email, "email");
         api.recoverPassword(email);
     }

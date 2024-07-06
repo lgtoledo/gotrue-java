@@ -265,19 +265,23 @@ class GoTrueApiTest {
         }
         final Session finalR = r;
         // send recovery link to user
-        Assertions.assertDoesNotThrow(() -> api.recoverPassword(finalR.getUser().getEmail()));
+        BaseResponse response = Assertions.assertDoesNotThrow(() -> api.recoverPassword(finalR.getUser().getEmail()));
+
+        // Verify that the response is not null and that the status code is OK (200)
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(HttpStatus.OK, response.getResponseMessage().getStatusCode());
     }
 
     @Test
     void recoverPassword_no_user() {
-        try {
-            api.recoverPassword("email@example.com");
-            // should throw an exception
-            Assertions.fail();
-        } catch (ApiException e) {
-            // there is no user with the given email
-            Assertions.assertTrue(e.getCause().getMessage().startsWith("404 Not Found"));
-        }
+        BaseResponse response = Assertions.assertDoesNotThrow(() -> api.recoverPassword("email@example.com"));
+
+        // An empty JSON object is returned. To obfuscate whether such an email address already
+        // exists in the system this response is sent regardless whether the address exists or not
+        // Verify that the response is not null and that the status code is OK (200)
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals("{}", response.getContent());
+        Assertions.assertEquals(HttpStatus.OK, response.getResponseMessage().getStatusCode());
     }
 
     @Test

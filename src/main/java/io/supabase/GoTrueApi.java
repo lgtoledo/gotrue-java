@@ -44,15 +44,16 @@ public class GoTrueApi {
      * Send a password-recovery link to a given email.
      *
      * @param email the email a recovery link should be sent to.
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public void recoverPassword(String email) throws ApiException {
+    public BaseResponse recoverPassword(String email) throws GotrueException {
         String urlRecover = String.format("%s/recover", url);
 
         EmailDto emailDto = new EmailDto();
         emailDto.setEmail(email);
 
-        Helpers.post(emailDto, headers, urlRecover);
+        //Helpers.post(emailDto, headers, urlRecover);
+        return Helpers.makeRequest(HttpMethod.POST, urlRecover, emailDto, headers);
     }
 
     /**

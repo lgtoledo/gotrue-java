@@ -606,7 +606,7 @@ class GoTrueClientTest {
             client.recover("email@example.com");
             // should throw an exception
             Assertions.fail();
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             // there is no user with the given email
             Assertions.assertTrue(e.getCause().getMessage().startsWith("404 Not Found"));
         }
