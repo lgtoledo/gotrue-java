@@ -15,12 +15,12 @@ import org.springframework.web.client.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RestUtils {
+public class Helpers {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final RestTemplate rest = new RestTemplate();
 
 
-    private RestUtils() {
+    private Helpers() {
     }
 
     public static <T> T makeRequest(HttpMethod method, String url, Object data, Map<String, String> headers, Class<T> responseType) throws GotrueException {
