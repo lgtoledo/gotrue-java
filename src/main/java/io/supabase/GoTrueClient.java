@@ -4,7 +4,7 @@ import io.jsonwebtoken.JwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
 import io.supabase.exceptions.*;
-import io.supabase.schemas.UserSchema;
+import io.supabase.schemas.User;
 import io.supabase.utils.ClientUtils;
 
 import java.util.Map;
@@ -114,7 +114,7 @@ public class GoTrueClient {
      * @return Details of the current user.
      * @throws IllegalArgumentException if you are currently not logged in.
      */
-    public UserSchema getCurrentUser() {
+    public User getCurrentUser() {
         checkAuthState();
 
         return currentAuth.getUser();
@@ -253,11 +253,11 @@ public class GoTrueClient {
      * Gets details about the user.
      *
      * @param jwt A valid, logged-in JWT.
-     * @return UserDto details about the user.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @return User details about the user.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the jwt token is not specified.
      */
-    public UserDto getUser(String jwt) throws ApiException {
+    public User getUser(String jwt) throws GotrueException {
         checkParam(jwt, "jwt");
 
         return api.getUser(jwt);

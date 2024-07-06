@@ -4,7 +4,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
 import io.supabase.exceptions.*;
-import io.supabase.schemas.UserSchema;
+import io.supabase.schemas.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -388,10 +388,10 @@ class GoTrueClientTest {
         }
         String jwt = r.getAccessToken();
 
-        UserDto user = null;
+        User user = null;
         try {
             user = client.getUser(jwt);
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         Utils.assertUserDto(user);
@@ -420,7 +420,7 @@ class GoTrueClientTest {
         } catch (GotrueException e) {
             Assertions.fail();
         }
-        UserSchema user = client.getCurrentUser();
+        User user = client.getCurrentUser();
         Assertions.assertEquals(r.getUser(), user);
     }
 
