@@ -11,17 +11,6 @@ import org.junit.jupiter.api.Assertions;
 
 class Utils {
 
-    protected static void assertAuthDto(AuthenticationDto dto) {
-        Assertions.assertNotNull(dto);
-        Assertions.assertNotNull(dto.getAccessToken());
-        Assertions.assertTrue(dto.getExpiresIn() > 0);
-        Assertions.assertNotNull(dto.getRefreshToken());
-        Assertions.assertNotNull(dto.getTokenType());
-        Assertions.assertNotNull(dto.getUser());
-        assertUserDto(dto.getUser());
-        // no check for userMetadata as it tends to be null here
-    }
-
     protected static void assertSession(Session dto) {
         Assertions.assertNotNull(dto);
         Assertions.assertNotNull(dto.getAccessToken());
