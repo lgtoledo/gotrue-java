@@ -6,6 +6,7 @@ import io.supabase.exceptions.GotrueException;
 import io.supabase.exceptions.UrlNotFoundException;
 import io.supabase.data.dto.Session;
 import io.supabase.responses.BaseResponse;
+import io.supabase.schemas.User;
 import io.supabase.utils.Helpers;
 import org.springframework.http.HttpMethod;
 
@@ -110,12 +111,12 @@ public class GoTrueApi {
      *
      * @param jwt A valid, logged-in JWT.
      * @return UserDto details about the user.
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public UserDto getUser(String jwt) throws ApiException {
+    public User getUser(String jwt) throws GotrueException {
         String urlUser = String.format("%s/user", url);
 
-        return Helpers.get(UserDto.class, headersWithJWT(jwt), urlUser);
+        return Helpers.makeRequest(HttpMethod.GET, urlUser, null, headersWithJWT(jwt), User.class);
     }
 
     // TODO: Ver lo de SignOutScope (Global, Local, others)

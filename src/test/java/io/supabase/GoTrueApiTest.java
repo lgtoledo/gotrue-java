@@ -4,6 +4,7 @@ import io.supabase.data.dto.*;
 import io.supabase.exceptions.*;
 import io.supabase.data.dto.Session;
 import io.supabase.responses.BaseResponse;
+import io.supabase.schemas.User;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
@@ -136,7 +137,7 @@ class GoTrueApiTest {
 
     @Test
     void getUser() {
-        UserDto user = null;
+        User user = null;
         try {
             // create a user to get a valid JWT
             Session r = api.signUpWithEmail("email@example.com", "secret");
@@ -144,7 +145,7 @@ class GoTrueApiTest {
             String jwt = r.getAccessToken();
 
             user = api.getUser(jwt);
-        } catch (GotrueException | ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         Utils.assertUserDto(user);
@@ -154,7 +155,9 @@ class GoTrueApiTest {
     @Test
     void getUser_invalidJWT() {
         String jwt = "somethingThatIsNotAValidJWT";
-        Assertions.assertThrows(ApiException.class, () -> api.getUser(jwt));
+        GotrueException exception = Assertions.assertThrows(GotrueException.class, () -> api.getUser(jwt));
+        // Verify that the reason is AdminTokenRequired
+        Assertions.assertEquals(FailureHint.Reason.AdminTokenRequired, exception.getReason());
     }
 
     @Test
