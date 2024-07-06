@@ -5,6 +5,7 @@ import io.supabase.exceptions.ApiException;
 import io.supabase.exceptions.GotrueException;
 import io.supabase.exceptions.UrlNotFoundException;
 import io.supabase.data.dto.Session;
+import io.supabase.responses.BaseResponse;
 import io.supabase.utils.Helpers;
 import org.springframework.http.HttpMethod;
 
@@ -117,17 +118,19 @@ public class GoTrueApi {
         return Helpers.get(UserDto.class, headersWithJWT(jwt), urlUser);
     }
 
+    // TODO: Ver lo de SignOutScope (Global, Local, others)
     /**
      * Removes a logged-in session.
      *
      * @param jwt A valid, logged-in JWT.
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public void signOut(String jwt) throws ApiException {
+    public BaseResponse signOut(String jwt) throws GotrueException {
         String urlLogout = String.format("%s/logout", url);
 
-        Helpers.post(headersWithJWT(jwt), urlLogout);
+        return Helpers.makeRequest(HttpMethod.POST, urlLogout, null, headersWithJWT(jwt));
     }
+
 
     /**
      * Logs in an existing user using their email address.
@@ -176,6 +179,7 @@ public class GoTrueApi {
     private Map<String, String> headersWithJWT(String jwt) {
         Map<String, String> newHeaders = new HashMap<>(headers);
         newHeaders.put("Authorization", String.format("Bearer %s", jwt));
+
         return newHeaders;
     }
 }

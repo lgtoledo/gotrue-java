@@ -157,7 +157,7 @@ public class GoTrueClient {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the either or both email and password are not specified.
      */
     public Session signUp(String email, String password) throws GotrueException {
@@ -203,12 +203,12 @@ public class GoTrueClient {
     }
 
     /**
-     * Signs out the current user, if there is a logged in user.
+     * Signs out the current user, if there is a logged-in user.
      *
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if you are currently not logged in.
      */
-    public void signOut() throws ApiException {
+    public void signOut() throws GotrueException {
         checkAuthState();
         api.signOut(currentAuth.getAccessToken());
     }
@@ -217,10 +217,10 @@ public class GoTrueClient {
      * Signs out the user of the given jwt.
      *
      * @param jwt A valid jwt.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the jwt token is not specified.
      */
-    public void signOut(String jwt) throws ApiException {
+    public void signOut(String jwt) throws GotrueException {
         checkParam(jwt, "jwt");
         api.signOut(jwt);
     }

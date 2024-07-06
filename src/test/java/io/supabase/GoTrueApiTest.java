@@ -3,7 +3,9 @@ package io.supabase;
 import io.supabase.data.dto.*;
 import io.supabase.exceptions.*;
 import io.supabase.data.dto.Session;
+import io.supabase.responses.BaseResponse;
 import org.junit.jupiter.api.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -70,7 +72,7 @@ class GoTrueApiTest {
 
         GotrueException exception = Assertions.assertThrows(GotrueException.class, () -> api.signUpWithEmail("email@example.com", "secret"));
 
-        // Verify that the reason is UserBadLogin
+        // Verify that the reason is UserAlreadyRegistered
         Assertions.assertEquals(FailureHint.Reason.UserAlreadyRegistered, exception.getReason());
     }
 
@@ -116,13 +118,20 @@ class GoTrueApiTest {
         }
         String jwt = r.getAccessToken();
 
-        Assertions.assertDoesNotThrow(() -> api.signOut(jwt));
+        BaseResponse response = Assertions.assertDoesNotThrow(() -> api.signOut(jwt));
+
+        // Verify that the response is not null and that the status code is NO_CONTENT (204)
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getResponseMessage().getStatusCode());
     }
 
     @Test
     void signOut_invalidJWT() {
         String jwt = "somethingThatIsNotAValidJWT";
-        Assertions.assertThrows(ApiException.class, () -> api.signOut(jwt));
+
+        GotrueException exception = Assertions.assertThrows(GotrueException.class, () -> api.signOut(jwt));
+        // Verify that the reason is AdminTokenRequired
+        Assertions.assertEquals(FailureHint.Reason.AdminTokenRequired, exception.getReason());
     }
 
     @Test
