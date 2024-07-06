@@ -1,6 +1,5 @@
 package io.supabase;
 
-import io.supabase.data.dto.AuthenticationDto;
 import io.supabase.data.dto.SettingsDto;
 import io.supabase.data.dto.UserDto;
 import io.supabase.data.dto.UserUpdatedDto;
