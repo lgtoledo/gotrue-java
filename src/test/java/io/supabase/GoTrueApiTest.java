@@ -308,6 +308,13 @@ class GoTrueApiTest {
     @Test
     void magicLink_no_user() {
         // there does not already have to be a user registered with the email
-        Assertions.assertDoesNotThrow(() -> api.magicLink("email@example.com"));
+        BaseResponse response = Assertions.assertDoesNotThrow(() -> api.magicLink("email@example.com"));
+
+        // An empty JSON object is returned. To obfuscate whether such an email address already
+        // exists in the system this response is sent regardless whether the address exists or not
+        // Verify that the response is not null and that the status code is OK (200)
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals("{}", response.getContent());
+        Assertions.assertEquals(HttpStatus.OK, response.getResponseMessage().getStatusCode());
     }
 }
