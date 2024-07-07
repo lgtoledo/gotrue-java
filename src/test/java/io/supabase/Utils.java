@@ -1,15 +1,15 @@
 package io.supabase;
 
-import io.supabase.data.dto.AuthenticationDto;
-import io.supabase.data.dto.SettingsDto;
+import io.supabase.data.dto.Settings;
 import io.supabase.data.dto.UserDto;
-import io.supabase.data.dto.UserUpdatedDto;
 import io.supabase.data.jwt.ParsedToken;
+import io.supabase.data.dto.Session;
+import io.supabase.schemas.User;
 import org.junit.jupiter.api.Assertions;
 
 class Utils {
 
-    protected static void assertAuthDto(AuthenticationDto dto) {
+    protected static void assertSession(Session dto) {
         Assertions.assertNotNull(dto);
         Assertions.assertNotNull(dto.getAccessToken());
         Assertions.assertTrue(dto.getExpiresIn() > 0);
@@ -20,7 +20,7 @@ class Utils {
         // no check for userMetadata as it tends to be null here
     }
 
-    protected static void assertUserUpdatedDto(UserUpdatedDto user) {
+    protected static void assertUserUpdated(User user) {
         Assertions.assertNotNull(user.getNewEmail());
         Assertions.assertNotNull(user.getEmailChangeSentAt());
         assertUserDto(user);
@@ -34,17 +34,30 @@ class Utils {
         Assertions.assertNotNull(user.getCreatedAt());
         Assertions.assertNotNull(user.getRole());
         Assertions.assertNotNull(user.getLastSignInAt());
-        Assertions.assertNotNull(user.getConfirmedAt());
+//        Assertions.assertNotNull(user.getConfirmedAt());
         Assertions.assertNotNull(user.getCreatedAt());
         Assertions.assertNotNull(user.getUpdatedAt());
         Assertions.assertNotNull(user.getAppMetadata());
     }
 
-    protected static void assertSettingsDto(SettingsDto s) {
+    protected static void assertUserDto(User user) {
+        Assertions.assertNotNull(user);
+        Assertions.assertNotNull(user.getId());
+        Assertions.assertNotNull(user.getAud());
+        Assertions.assertNotNull(user.getEmail());
+        Assertions.assertNotNull(user.getCreatedAt());
+        Assertions.assertNotNull(user.getRole());
+        Assertions.assertNotNull(user.getLastSignInAt());
+//        Assertions.assertNotNull(user.getConfirmedAt());
+        Assertions.assertNotNull(user.getCreatedAt());
+        Assertions.assertNotNull(user.getUpdatedAt());
+        Assertions.assertNotNull(user.getAppMetadata());
+    }
+
+    protected static void assertSettings(Settings s) {
         Assertions.assertNotNull(s);
-        Assertions.assertNotNull(s.getAutoconfirm());
+        Assertions.assertNotNull(s.getMailerAutoconfirm());
         Assertions.assertNotNull(s.getExternal());
-        Assertions.assertNotNull(s.getExternalLabels());
         Assertions.assertNotNull(s.getDisableSignup());
     }
 

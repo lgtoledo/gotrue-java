@@ -3,10 +3,9 @@ package io.supabase;
 import io.jsonwebtoken.JwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
-import io.supabase.exceptions.ApiException;
-import io.supabase.exceptions.JwtSecretNotFoundException;
-import io.supabase.exceptions.MalformedHeadersException;
-import io.supabase.exceptions.UrlNotFoundException;
+import io.supabase.exceptions.*;
+import io.supabase.responses.BaseResponse;
+import io.supabase.schemas.User;
 import io.supabase.utils.ClientUtils;
 
 import java.util.Map;
@@ -16,7 +15,7 @@ public class GoTrueClient {
     private final GoTrueApi api;
     private final String url;
     private final Map<String, String> headers;
-    private AuthenticationDto currentAuth;
+    private Session currentAuth;
 
     protected GoTrueClient(String url, Map<String, String> headers) throws UrlNotFoundException, MalformedHeadersException {
         this.url = url != null ? url : ClientUtils.loadUrl();
@@ -54,6 +53,7 @@ public class GoTrueClient {
         if (client == null) {
             client = new GoTrueClient();
         }
+
         return client;
     }
 
@@ -66,6 +66,7 @@ public class GoTrueClient {
      * @throws MalformedHeadersException if the default headers are specified but in an invalid format.
      */
     public static GoTrueClient i() throws UrlNotFoundException, MalformedHeadersException {
+
         return getInstance();
     }
 
@@ -81,6 +82,7 @@ public class GoTrueClient {
      */
     public ParsedToken parseJwt(String jwt) throws JwtSecretNotFoundException {
         checkParam(jwt, "jwt");
+
         return ClientUtils.parseJwt(jwt);
     }
 
@@ -97,9 +99,11 @@ public class GoTrueClient {
         checkParam(jwt, "jwt");
         try {
             ClientUtils.parseJwt(jwt);
+
             // no error -> valid
             return true;
         } catch (JwtException e) {
+
             return false;
         }
     }
@@ -111,8 +115,9 @@ public class GoTrueClient {
      * @return Details of the current user.
      * @throws IllegalArgumentException if you are currently not logged in.
      */
-    public UserDto getCurrentUser() {
+    public User getCurrentUser() {
         checkAuthState();
+
         return currentAuth.getUser();
     }
 
@@ -123,8 +128,9 @@ public class GoTrueClient {
      * @return Details of the current authentication.
      * @throws IllegalArgumentException if you are currently not logged in.
      */
-    public AuthenticationDto getCurrentAuth() {
+    public Session getCurrentAuth() {
         checkAuthState();
+
         return currentAuth;
     }
 
@@ -134,30 +140,17 @@ public class GoTrueClient {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
-     * @throws IllegalArgumentException if the either or both email and password are not specified.
+     * @throws GotrueException             if the underlying http request throws an error of any kind.
+     * @throws IllegalArgumentException If either the email, password, or both are not specified.
      */
-    public AuthenticationDto signIn(String email, String password) throws ApiException {
+    public Session signIn(String email, String password) throws GotrueException {
         checkParam(email, "email");
         checkParam(password, "password");
         currentAuth = api.signInWithEmail(email, password);
+
         return currentAuth;
     }
 
-    /**
-     * Logs in an existing user using their email address.
-     *
-     * @param credentials Object with the email and/or the password or the provider of the user.
-     * @return Details about the authentication.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
-     * @throws IllegalArgumentException if the the credentials are not specified.
-     */
-    public AuthenticationDto signIn(CredentialsDto credentials) throws ApiException {
-        checkParam(credentials, "credentials");
-        checkParam(credentials.getEmail(), "credentials.email");
-        checkParam(credentials.getPassword(), "credentials.password");
-        return signIn(credentials.getEmail(), credentials.getPassword());
-    }
 
     /**
      * Creates a new user using their email address.
@@ -165,44 +158,31 @@ public class GoTrueClient {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the either or both email and password are not specified.
      */
-    public AuthenticationDto signUp(String email, String password) throws ApiException {
+    public Session signUp(String email, String password) throws GotrueException {
         checkParam(email, "email");
         checkParam(password, "password");
         currentAuth = api.signUpWithEmail(email, password);
+
         return currentAuth;
     }
 
-    /**
-     * Creates a new user using their email address.
-     *
-     * @param credentials Object with the email and the password of the user.
-     * @return Details about the authentication.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
-     * @throws IllegalArgumentException if the the credentials are not specified.
-     */
-    public AuthenticationDto signUp(CredentialsDto credentials) throws ApiException {
-        checkParam(credentials, "credentials");
-        checkParam(credentials.getEmail(), "credentials.email");
-        checkParam(credentials.getPassword(), "credentials.password");
-        currentAuth = api.signUpWithEmail(credentials);
-        return currentAuth;
-    }
 
     /**
-     * Update the currently logged in user
+     * Update the currently logged-in user
      *
      * @param attributes The data you want to update
      * @return details of the updated user.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if you are currently not logged in.
      * @throws IllegalArgumentException if the attributes are not specified.
      */
-    public UserUpdatedDto update(UserAttributesDto attributes) throws ApiException {
+    public User update(UserAttributesDto attributes) throws GotrueException {
         checkAuthState();
         checkParam(attributes, "attributes");
+
         return api.updateUser(currentAuth.getAccessToken(), attributes);
     }
 
@@ -212,23 +192,24 @@ public class GoTrueClient {
      * @param jwt        of the user you want to update.
      * @param attributes The data you want to update
      * @return details of the updated user.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the jwt token is not specified.
      * @throws IllegalArgumentException if the attributes are not specified.
      */
-    public UserUpdatedDto update(String jwt, UserAttributesDto attributes) throws ApiException {
+    public User update(String jwt, UserAttributesDto attributes) throws GotrueException {
         checkParam(jwt, "jwt");
         checkParam(attributes, "attributes");
+
         return api.updateUser(jwt, attributes);
     }
 
     /**
-     * Signs out the current user, if there is a logged in user.
+     * Signs out the current user, if there is a logged-in user.
      *
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if you are currently not logged in.
      */
-    public void signOut() throws ApiException {
+    public void signOut() throws GotrueException {
         checkAuthState();
         api.signOut(currentAuth.getAccessToken());
     }
@@ -237,10 +218,10 @@ public class GoTrueClient {
      * Signs out the user of the given jwt.
      *
      * @param jwt A valid jwt.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the jwt token is not specified.
      */
-    public void signOut(String jwt) throws ApiException {
+    public void signOut(String jwt) throws GotrueException {
         checkParam(jwt, "jwt");
         api.signOut(jwt);
     }
@@ -249,9 +230,10 @@ public class GoTrueClient {
      * Get the settings from the gotrue server.
      *
      * @return settings from the gotrue server.
-     * @throws ApiException if the underlying http request throws an error of any kind.
+     * @throws GotrueException if the underlying http request throws an error of any kind.
      */
-    public SettingsDto settings() throws ApiException {
+    public Settings settings() throws GotrueException {
+
         return api.getSettings();
     }
 
@@ -259,11 +241,12 @@ public class GoTrueClient {
      * Generates a new JWT, for current user.
      *
      * @return The updated information with the refreshed token
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if you are currently not logged in.
      */
-    public AuthenticationDto refresh() throws ApiException {
+    public Session refresh() throws GotrueException {
         checkAuthState();
+
         return api.refreshAccessToken(currentAuth.getRefreshToken());
     }
 
@@ -271,12 +254,13 @@ public class GoTrueClient {
      * Gets details about the user.
      *
      * @param jwt A valid, logged-in JWT.
-     * @return UserDto details about the user.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @return User details about the user.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the jwt token is not specified.
      */
-    public UserDto getUser(String jwt) throws ApiException {
+    public User getUser(String jwt) throws GotrueException {
         checkParam(jwt, "jwt");
+
         return api.getUser(jwt);
     }
 
@@ -286,11 +270,12 @@ public class GoTrueClient {
      *
      * @param refreshToken A valid refresh token that was returned on login.
      * @return The updated information with the refreshed token
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException  if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the refresh token is not specified.
      */
-    public AuthenticationDto refresh(String refreshToken) throws ApiException {
+    public Session refresh(String refreshToken) throws GotrueException {
         checkParam(refreshToken, "refreshToken");
+
         return api.refreshAccessToken(refreshToken);
     }
 
@@ -298,12 +283,13 @@ public class GoTrueClient {
      * Send a password-recovery link to a given email.
      *
      * @param email the email a recovery link should be sent to.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException             if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the email is not specified.
      */
-    public void recover(String email) throws ApiException {
+    public BaseResponse recover(String email) throws GotrueException {
         checkParam(email, "email");
-        api.recoverPassword(email);
+
+        return api.recoverPassword(email);
     }
 
     private void checkAuthState() {

@@ -1,9 +1,12 @@
 package io.supabase;
 
 import io.supabase.data.dto.*;
-import io.supabase.exceptions.ApiException;
-import io.supabase.exceptions.UrlNotFoundException;
+import io.supabase.exceptions.*;
+import io.supabase.data.dto.Session;
+import io.supabase.responses.BaseResponse;
+import io.supabase.schemas.User;
 import org.junit.jupiter.api.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -33,7 +36,7 @@ class GoTrueApiTest {
 
     @AfterEach
     void tearDown() {
-        // to ensure that the tests dont affect each other
+        // to ensure that the tests don't affect each other
         RestTemplate rest = new RestTemplate();
         rest.delete("http://localhost:3000/users");
     }
@@ -51,71 +54,42 @@ class GoTrueApiTest {
 
     @Test
     void signUpWithEmail() {
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = api.signUpWithEmail("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertAuthDto(r);
-    }
-
-    @Test
-    void signUpWithEmail_credentials() {
-        CredentialsDto credentials = new CredentialsDto();
-        credentials.setEmail("email@example.com");
-        credentials.setPassword("secret");
-
-        AuthenticationDto r = null;
-        try {
-            r = api.signUpWithEmail(credentials);
-        } catch (ApiException e) {
-            Assertions.fail();
-        }
-        Utils.assertAuthDto(r);
+        Utils.assertSession(r);
     }
 
     @Test
     void signUpWithEmail_AlreadyExists() {
         try {
             api.signUpWithEmail("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Assertions.assertThrows(ApiException.class, () -> api.signUpWithEmail("email@example.com", "secret"));
+
+        GotrueException exception = Assertions.assertThrows(GotrueException.class, () -> api.signUpWithEmail("email@example.com", "secret"));
+
+        // Verify that the reason is UserAlreadyRegistered
+        Assertions.assertEquals(FailureHint.Reason.UserAlreadyRegistered, exception.getReason());
     }
 
     @Test
     void signInWithEmail() {
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             // create a user
             api.signUpWithEmail("email@example.com", "secret");
 
             // login with said user
             r = api.signInWithEmail("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertAuthDto(r);
-    }
-
-    @Test
-    void signInWithEmail_credentials() {
-        AuthenticationDto r = null;
-        try {
-            // create a user
-            api.signUpWithEmail("email@example.com", "secret");
-
-            // login with said user
-            CredentialsDto credentials = new CredentialsDto();
-            credentials.setEmail("email@example.com");
-            credentials.setPassword("secret");
-            r = api.signInWithEmail(credentials);
-        } catch (ApiException e) {
-            Assertions.fail();
-        }
-        Utils.assertAuthDto(r);
+        Utils.assertSession(r);
     }
 
     @Test
@@ -123,44 +97,55 @@ class GoTrueApiTest {
         // create a user
         try {
             api.signUpWithEmail("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        // login with said user
-        Assertions.assertThrows(ApiException.class, () -> api.signInWithEmail("email@example.com", "notSecret"));
+
+        // login with said user and check the exception
+        GotrueException exception = Assertions.assertThrows(GotrueException.class, () -> api.signInWithEmail("email@example.com", "notSecret"));
+
+        // Verify that the reason is UserBadLogin
+        Assertions.assertEquals(FailureHint.Reason.UserBadLogin, exception.getReason());
     }
 
     @Test
     void signOut() {
         // create a user to get a valid JWT
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             r = api.signUpWithEmail("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         String jwt = r.getAccessToken();
 
-        Assertions.assertDoesNotThrow(() -> api.signOut(jwt));
+        BaseResponse response = Assertions.assertDoesNotThrow(() -> api.signOut(jwt));
+
+        // Verify that the response is not null and that the status code is NO_CONTENT (204)
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getResponseMessage().getStatusCode());
     }
 
     @Test
     void signOut_invalidJWT() {
         String jwt = "somethingThatIsNotAValidJWT";
-        Assertions.assertThrows(ApiException.class, () -> api.signOut(jwt));
+
+        GotrueException exception = Assertions.assertThrows(GotrueException.class, () -> api.signOut(jwt));
+        // Verify that the reason is AdminTokenRequired
+        Assertions.assertEquals(FailureHint.Reason.AdminTokenRequired, exception.getReason());
     }
 
     @Test
     void getUser() {
-        UserDto user = null;
+        User user = null;
         try {
             // create a user to get a valid JWT
-            AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
+            Session r = api.signUpWithEmail("email@example.com", "secret");
 
             String jwt = r.getAccessToken();
 
             user = api.getUser(jwt);
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         Utils.assertUserDto(user);
@@ -170,24 +155,31 @@ class GoTrueApiTest {
     @Test
     void getUser_invalidJWT() {
         String jwt = "somethingThatIsNotAValidJWT";
-        Assertions.assertThrows(ApiException.class, () -> api.getUser(jwt));
+        GotrueException exception = Assertions.assertThrows(GotrueException.class, () -> api.getUser(jwt));
+        // Verify that the reason is AdminTokenRequired
+        Assertions.assertEquals(FailureHint.Reason.AdminTokenRequired, exception.getReason());
     }
 
     @Test
     void refreshAccessToken() {
-        AuthenticationDto r = null;
-        AuthenticationDto a = null;
+        Session r = null;
+        Session a = null;
         try {
             // create a user to get a valid refreshToken
             r = api.signUpWithEmail("email@example.com", "secret");
 
             String token = r.getRefreshToken();
 
+            // wait for some milliseconds to ensure that the tokens are different
+            Thread.sleep(1000);
+
             a = api.refreshAccessToken(token);
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        Utils.assertAuthDto(a);
+        Utils.assertSession(a);
         Assertions.assertNotEquals(r.getAccessToken(), a.getAccessToken());
         Assertions.assertNotEquals(r.getRefreshToken(), a.getRefreshToken());
     }
@@ -195,46 +187,58 @@ class GoTrueApiTest {
     @Test
     void refreshAccessToken_invalidToken() {
         String token = "noValidToken";
-        Assertions.assertThrows(ApiException.class, () -> api.refreshAccessToken(token));
+        GotrueException exception = Assertions.assertThrows(GotrueException.class, () -> api.refreshAccessToken(token));
+
+        // Verify that the reason is InvalidRefreshToken
+        Assertions.assertEquals(FailureHint.Reason.InvalidRefreshToken, exception.getReason());
     }
 
     @Test
     void updateUser_email() {
         UserAttributesDto attr = null;
-        UserUpdatedDto user = null;
+        User user = null;
         try {
             // create a user
-            AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
+            Session r = api.signUpWithEmail("email@example.com", "secret");
 
             attr = new UserAttributesDto();
             attr.setEmail("newemail@example.com");
 
             user = api.updateUser(r.getAccessToken(), attr);
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertUserUpdatedDto(user);
+        Utils.assertUserUpdated(user);
         Assertions.assertEquals(user.getNewEmail(), attr.getEmail());
         Assertions.assertNotNull(user.getUserMetadata());
     }
 
     @Test
     void updateUser_password() {
-        UserUpdatedDto user = null;
+        User user = null;
         try {
             // create a user
-            AuthenticationDto r = api.signUpWithEmail("email@example.com", "secret");
+            Session r = api.signUpWithEmail("email@example.com", "secret");
 
             UserAttributesDto attr = new UserAttributesDto();
-            attr.setPassword("pass");
+            attr.setPassword("pass12");
 
             user = api.updateUser(r.getAccessToken(), attr);
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
         // normal assert because there is no new email attribute
         Utils.assertUserDto(user);
         Assertions.assertNotNull(user.getUserMetadata());
+
+        // login with the new password
+        Session s = null;
+        try {
+            s = api.signInWithEmail("email@example.com", "pass12");
+        } catch (GotrueException e) {
+            Assertions.fail();
+        }
+        Utils.assertSession(s);
     }
 
     @Test
@@ -246,58 +250,77 @@ class GoTrueApiTest {
 
     @Test
     void getSettings() {
-        SettingsDto s = null;
+        Settings s = null;
         try {
             s = api.getSettings();
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        Utils.assertSettingsDto(s);
+        Utils.assertSettings(s);
     }
 
     @Test
     void recoverPassword() {
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             // create a user
             r = api.signUpWithEmail("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        final AuthenticationDto finalR = r;
+        final Session finalR = r;
         // send recovery link to user
-        Assertions.assertDoesNotThrow(() -> api.recoverPassword(finalR.getUser().getEmail()));
+        BaseResponse response = Assertions.assertDoesNotThrow(() -> api.recoverPassword(finalR.getUser().getEmail()));
+
+        // Verify that the response is not null and that the status code is OK (200)
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals("{}", response.getContent());
+        Assertions.assertEquals(HttpStatus.OK, response.getResponseMessage().getStatusCode());
     }
 
     @Test
     void recoverPassword_no_user() {
-        try {
-            api.recoverPassword("email@example.com");
-            // should throw an exception
-            Assertions.fail();
-        } catch (ApiException e) {
-            // there is no user with the given email
-            Assertions.assertTrue(e.getCause().getMessage().startsWith("404 Not Found"));
-        }
+        BaseResponse response = Assertions.assertDoesNotThrow(() -> api.recoverPassword("email@example.com"));
+
+        // An empty JSON object is returned. To obfuscate whether such an email address already
+        // exists in the system this response is sent regardless whether the address exists or not
+        // Verify that the response is not null and that the status code is OK (200)
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals("{}", response.getContent());
+        Assertions.assertEquals(HttpStatus.OK, response.getResponseMessage().getStatusCode());
     }
 
     @Test
     void magicLink() {
-        AuthenticationDto r = null;
+        Session r = null;
         try {
             // create a user
             r = api.signUpWithEmail("email@example.com", "secret");
-        } catch (ApiException e) {
+        } catch (GotrueException e) {
             Assertions.fail();
         }
-        final AuthenticationDto finalR = r;
+        final Session finalR = r;
         // send recovery link to user
-        Assertions.assertDoesNotThrow(() -> api.magicLink(finalR.getUser().getEmail()));
+        BaseResponse response = Assertions.assertDoesNotThrow(() -> api.magicLink(finalR.getUser().getEmail()));
+
+        // An empty JSON object is returned. To obfuscate whether such an email address already
+        // exists in the system this response is sent regardless whether the address exists or not
+        // Verify that the response is not null and that the status code is OK (200)
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals("{}", response.getContent());
+        Assertions.assertEquals(HttpStatus.OK, response.getResponseMessage().getStatusCode());
     }
 
     @Test
     void magicLink_no_user() {
-        // there does not already have to be an user registered with the email
-        Assertions.assertDoesNotThrow(() -> api.magicLink("email@example.com"));
+        // there does not already have to be a user registered with the email
+        BaseResponse response = Assertions.assertDoesNotThrow(() -> api.magicLink("email@example.com"));
+
+        // An empty JSON object is returned. To obfuscate whether such an email address already
+        // exists in the system this response is sent regardless whether the address exists or not
+        // Verify that the response is not null and that the status code is OK (200)
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals("{}", response.getContent());
+        Assertions.assertEquals(HttpStatus.OK, response.getResponseMessage().getStatusCode());
     }
 }

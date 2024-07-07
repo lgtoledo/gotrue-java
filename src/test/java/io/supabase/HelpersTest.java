@@ -3,7 +3,7 @@ package io.supabase;
 import io.supabase.data.CircularDependentA;
 import io.supabase.data.CircularDependentB;
 import io.supabase.exceptions.ApiException;
-import io.supabase.utils.RestUtils;
+import io.supabase.utils.Helpers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-class RestUtilsTest {
+class HelpersTest {
 
     @AfterEach
     void tearDown() {
@@ -27,9 +27,9 @@ class RestUtilsTest {
     @Test
     void constructor() {
         try {
-            Constructor<RestUtils> c = RestUtils.class.getDeclaredConstructor();
+            Constructor<Helpers> c = Helpers.class.getDeclaredConstructor();
             c.setAccessible(true);
-            AtomicReference<RestUtils> rUtils = new AtomicReference<>(null);
+            AtomicReference<Helpers> rUtils = new AtomicReference<>(null);
             Assertions.assertDoesNotThrow(() -> rUtils.set(c.newInstance()));
             Assertions.assertNotNull(rUtils.get());
         } catch (NoSuchMethodException e) {
@@ -39,7 +39,7 @@ class RestUtilsTest {
 
     @Test
     void get_headers() {
-        Assertions.assertThrows(ApiException.class, () -> RestUtils.get(Object.class, new HashMap<>(), "http://smth/"));
+        Assertions.assertThrows(ApiException.class, () -> Helpers.get(Object.class, new HashMap<>(), "http://smth/"));
     }
 
     @Test
@@ -49,7 +49,7 @@ class RestUtilsTest {
         CircularDependentB b = new CircularDependentB();
         a.setB(b);
         b.setA(a);
-        Assertions.assertThrows(ApiException.class, () -> RestUtils.post(a, CircularDependentA.class, null, "http://smth/"));
+        Assertions.assertThrows(ApiException.class, () -> Helpers.post(a, CircularDependentA.class, null, "http://smth/"));
     }
 
 
@@ -60,7 +60,7 @@ class RestUtilsTest {
         CircularDependentB b = new CircularDependentB();
         a.setB(b);
         b.setA(a);
-        Assertions.assertThrows(ApiException.class, () -> RestUtils.post(a, CircularDependentA.class, new HashMap<>(), "http://smth/"));
+        Assertions.assertThrows(ApiException.class, () -> Helpers.post(a, CircularDependentA.class, new HashMap<>(), "http://smth/"));
     }
 
 
@@ -71,19 +71,19 @@ class RestUtilsTest {
         CircularDependentB b = new CircularDependentB();
         a.setB(b);
         b.setA(a);
-        Assertions.assertThrows(ApiException.class, () -> RestUtils.put(a, CircularDependentA.class, null, "http://smth/"));
+        Assertions.assertThrows(ApiException.class, () -> Helpers.put(a, CircularDependentA.class, null, "http://smth/"));
     }
 
     @Test
     void put() {
         // some url that does not exist
-        Assertions.assertThrows(ApiException.class, () -> RestUtils.put(null, Object.class, null, "http://localhost:1/"));
+        Assertions.assertThrows(ApiException.class, () -> Helpers.put(null, Object.class, null, "http://localhost:1/"));
     }
 
     @Test
     void toEntity_nulls() {
         try {
-            Method m = RestUtils.class.getDeclaredMethod("toEntity", String.class, Map.class);
+            Method m = Helpers.class.getDeclaredMethod("toEntity", String.class, Map.class);
             m.setAccessible(true);
             Assertions.assertDoesNotThrow(() -> m.invoke(null, null, null));
         } catch (NoSuchMethodException e) {
@@ -94,7 +94,7 @@ class RestUtilsTest {
     @Test
     void toEntity() {
         try {
-            Method m = RestUtils.class.getDeclaredMethod("toEntity", String.class, Map.class);
+            Method m = Helpers.class.getDeclaredMethod("toEntity", String.class, Map.class);
             m.setAccessible(true);
             Assertions.assertDoesNotThrow(() -> m.invoke(null, "{\"a\":1}", new HashMap<>()));
         } catch (NoSuchMethodException e) {
