@@ -12,9 +12,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import org.junit.jupiter.api.extension.ExtendWith;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 
+@ExtendWith(SystemStubsExtension.class)
 class ClientUtilsTest {
+
+    @SystemStub
+    private EnvironmentVariables environmentVariables;
+
     @AfterEach
     void tearDown() {
         System.clearProperty("gotrue.headers");
@@ -76,8 +84,8 @@ class ClientUtilsTest {
         try {
             Method m = ClientUtils.class.getDeclaredMethod("getJwtSecret");
             m.setAccessible(true);
-            withEnvironmentVariable("GOTRUE_JWT_SECRET", "superSecretJwtToken")
-                    .execute(() -> Assertions.assertEquals("superSecretJwtToken", m.invoke(null)));
+            environmentVariables.set("GOTRUE_JWT_SECRET", "superSecretJwtToken");
+            Assertions.assertEquals("superSecretJwtToken", m.invoke(null));
         } catch (Exception e) {
             Assertions.fail();
         }
