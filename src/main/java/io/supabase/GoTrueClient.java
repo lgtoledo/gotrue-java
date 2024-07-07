@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtException;
 import io.supabase.data.dto.*;
 import io.supabase.data.jwt.ParsedToken;
 import io.supabase.exceptions.*;
+import io.supabase.responses.BaseResponse;
 import io.supabase.schemas.User;
 import io.supabase.utils.ClientUtils;
 
@@ -139,10 +140,10 @@ public class GoTrueClient {
      * @param email    The email address of the user.
      * @param password The password of the user.
      * @return Details about the authentication.
-     * @throws ApiException             if the underlying http request throws an error of any kind.
+     * @throws GotrueException             if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException If either the email, password, or both are not specified.
      */
-    public Session signIn(String email, String password) throws ApiException, GotrueException {
+    public Session signIn(String email, String password) throws GotrueException {
         checkParam(email, "email");
         checkParam(password, "password");
         currentAuth = api.signInWithEmail(email, password);
@@ -285,9 +286,10 @@ public class GoTrueClient {
      * @throws GotrueException             if the underlying http request throws an error of any kind.
      * @throws IllegalArgumentException if the email is not specified.
      */
-    public void recover(String email) throws GotrueException {
+    public BaseResponse recover(String email) throws GotrueException {
         checkParam(email, "email");
-        api.recoverPassword(email);
+
+        return api.recoverPassword(email);
     }
 
     private void checkAuthState() {
