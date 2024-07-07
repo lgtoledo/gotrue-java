@@ -274,6 +274,7 @@ class GoTrueApiTest {
 
         // Verify that the response is not null and that the status code is OK (200)
         Assertions.assertNotNull(response);
+        Assertions.assertEquals("{}", response.getContent());
         Assertions.assertEquals(HttpStatus.OK, response.getResponseMessage().getStatusCode());
     }
 
