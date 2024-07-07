@@ -52,7 +52,6 @@ public class GoTrueApi {
         EmailDto emailDto = new EmailDto();
         emailDto.setEmail(email);
 
-        //Helpers.post(emailDto, headers, urlRecover);
         return Helpers.makeRequest(HttpMethod.POST, urlRecover, emailDto, headers);
     }
 
